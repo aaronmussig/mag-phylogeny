@@ -1,0 +1,4 @@
+jobscript: jobscript.sh
+cluster: submit.sh
+cluster-status: status.sh
+cluster-cancel: cancel.sh

@@ -1,0 +1,53 @@
+import sys
+from pathlib import Path
+
+
+sys.path.insert(0,Path(workflow.basedir).parent.parent.as_posix())
+
+from magphylogeny.model.gtdbtk.phylorank import GTDBTkPhylorankOutliers
+from magphylogeny.model.gtdbtk.bootstrap import GTDBTkBootstrapMsaReplicate
+from magphylogeny.model.marker_genes.concat_marker import MarkerGenesConcatMarkerTrimmed, MarkerGenesConcatGeneTree
+from magphylogeny.model.gtdb.taxonomy import GTDBTaxonomyFile
+from magphylogeny.model.plots.marker_summary import PlotMarkerSummary
+from magphylogeny.model.summary.novelty_of_genomes import SummaryNoveltyOfGenomes
+from magphylogeny.model.plots.red_distribution import PlotRedDistribution
+
+CONCAT_MARKER_TREE = MarkerGenesConcatGeneTree(config)
+GTDBTK_BS_MSA_REP = GTDBTkBootstrapMsaReplicate(config)
+GTDBTK_PHYLORANK_OUTLIERS = GTDBTkPhylorankOutliers(config)
+CONCAT_MARKER_TRIMMED = MarkerGenesConcatMarkerTrimmed(config)
+tax_file = GTDBTaxonomyFile(config)
+PLOT_MARKER_SUMMARY = PlotMarkerSummary(config)
+PLOT_RED_DIST = PlotRedDistribution(config)
+SUMMARY_NOVELTY_GENOMES = SummaryNoveltyOfGenomes(config)
+
+include: "rules/gtdbtk.smk"
+include: "rules/gtdb.smk"
+include: "rules/marker_genes.smk"
+include: "rules/plots.smk"
+include: "rules/summary.smk"
+
+
+rule all:
+    input:
+        tax_file.get_output_tsv('ar53'),
+        tax_file.get_output_tsv('bac120')
+
+    # rule all:
+    #     input:
+    #         expand(CONCAT_MARKER_TREE.tree('ar53', '{marker}'), marker=config['gtdbtk']['markers']['ar53']),
+    #         expand(CONCAT_MARKER_TREE.tree('bac120','{marker}'), marker=config['gtdbtk']['markers']['bac120']),
+    #
+    #         GTDBTK_PHYLORANK_OUTLIERS.node_rd('ar53'),
+    #         GTDBTK_PHYLORANK_OUTLIERS.node_rd('bac120'),
+    #
+    #         PLOT_MARKER_SUMMARY.path('ar53','png'),
+    #         PLOT_MARKER_SUMMARY.path('bac120','png'),
+    #
+    #         PLOT_RED_DIST.path('ar53', 'png'),
+    #         PLOT_RED_DIST.path('bac120', 'png'),
+    #
+    #         SUMMARY_NOVELTY_GENOMES.path('ar53'),
+    #         SUMMARY_NOVELTY_GENOMES.path('bac120')
+    #
+    #
